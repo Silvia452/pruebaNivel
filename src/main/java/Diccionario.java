@@ -11,14 +11,18 @@ public class Diccionario {
     public Diccionario() {
         tablaHash = new HashMap<>();
         for (char c = 'a'; c <= 'z'; c++) {
-            tablaHash.put(c, new LinkedList<>());
+            tablaHash.put(c, new LinkedList<String>());
         }
     }
 
     public void agregarPalabra(String palabra) {
         char primeraLetra = palabra.charAt(0);
-        LinkedList<String> lista = tablaHash.get(primeraLetra);
-        lista.add(palabra);
+        LinkedList<String> palabrasConLetra = tablaHash.get(primeraLetra);
+        if (palabrasConLetra == null) {
+            palabrasConLetra = new LinkedList<String>();
+            tablaHash.put(primeraLetra, palabrasConLetra);
+        }
+        palabrasConLetra.add(palabra);
     }
 
     public boolean buscarPalabra(String palabra) {
@@ -27,22 +31,46 @@ public class Diccionario {
         return palabrasConLetra.contains(palabra);
     }
 
-    public void leerArchivo(String nombreArchivo) {
-        try {
-            FileReader archivo = new FileReader(nombreArchivo);
-            BufferedReader lector = new BufferedReader(archivo);
-            String linea = lector.readLine();
-            while (linea != null) {
-                String[] palabras = linea.split(","); // o cualquier otro delimitador
-                for (String palabra : palabras) {
-                    agregarPalabra(palabra.trim().toLowerCase()); // para evitar problemas con mayúsculas y espacios en blanco
-                }
-                linea = lector.readLine();
+
+    public void leerDiccionario(String rutaArchivo) {
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+            String linea;
+
+            for (int i = 0; i < 4; i++) {
+                br.readLine();
             }
-            lector.close();
+
+            while ((linea = br.readLine()) != null) {
+                String[] datos = linea.split(",");
+                String palabra = datos[0];
+                agregarPalabra(palabra);
+            }
         } catch (IOException e) {
-            System.out.println("Error al leer el archivo: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
+    public void imprimirTablaHash() {
+        for (HashMap.Entry<Character, LinkedList<String>> entry : tablaHash.entrySet()) {
+            char letra = entry.getKey();
+            LinkedList<String> palabrasConLetra = entry.getValue();
+            System.out.print(letra + ": ");
+            if (palabrasConLetra != null) {
+                for (String palabra : palabrasConLetra) {
+                    System.out.print(palabra + " ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    public static void mainDiccionario() {
+        Diccionario diccionario = new Diccionario();
+        diccionario.leerDiccionario("palabras.csv");
+        diccionario.imprimirTablaHash();
+    }
+
+
+
 
 }
