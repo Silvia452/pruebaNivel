@@ -1,8 +1,7 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 
-public class pruebaNivel {
+public class TablaHash {
 
     private ArrayList<LinkedList<String>> tabla;
     private int tamano;
